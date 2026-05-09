@@ -1,4 +1,5 @@
 // app/[lang]/about/page.tsx
+import { Suspense } from "react";
 import Image from "next/image";
 import type { SupportedLang } from "@/config/books";
 
@@ -89,50 +90,64 @@ const authorData = {
   ],
 };
 
+// Componente que contiene el contenido principal de la página
+function AboutContent({ lang }: { lang: SupportedLang }) {
+  const copy = aboutCopy[lang] ?? aboutCopy.en;
+  
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
+      <header className="mb-16 text-center">
+        <h1 className="font-serif text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+          {copy.title}
+        </h1>
+        <p className="mt-4 font-serif text-xl text-indigo-200">{copy.name}</p>
+        <div className="mt-8 flex justify-center gap-6">
+          {authorData.social.map((item) => (
+            <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">
+              {item.icon}
+            </a>
+          ))}
+        </div>
+      </header>
+
+      <div className="grid gap-12 lg:grid-cols-2 lg:items-start lg:gap-16">
+        <div className="flex justify-center">
+          <div className="relative w-full max-w-md aspect-[4/5] shadow-2xl overflow-hidden rounded-sm">
+            <Image src={authorData.imageSrc} alt={authorData.name} fill className="object-cover" priority />
+          </div>
+        </div>
+
+        <div className="space-y-6 font-serif text-lg leading-relaxed text-indigo-50">
+          {copy.paragraphs.map((paragraph, index) => (
+            <p key={index}>
+              {index === 0 ? (
+                <>
+                  <strong className="text-white">{copy.name.replace(".", "")}</strong>
+                  {paragraph.replace("Gregori H. Orlov", "")}
+                </>
+              ) : (
+                paragraph
+              )}
+            </p>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default async function AboutPage({ params }: AboutPageProps) {
   const { lang } = await params;
-  const copy = aboutCopy[lang] ?? aboutCopy.en;
 
   return (
     <main className="bg-[#0d1b2b] text-white">
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
-        <header className="mb-16 text-center">
-          <h1 className="font-serif text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            {copy.title}
-          </h1>
-          <p className="mt-4 font-serif text-xl text-indigo-200">{copy.name}</p>
-          <div className="mt-8 flex justify-center gap-6">
-            {authorData.social.map((item) => (
-              <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer" className="hover:text-indigo-400 transition-colors">
-                {item.icon}
-              </a>
-            ))}
-          </div>
-        </header>
-
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-start lg:gap-16">
-          <div className="flex justify-center">
-            <div className="relative w-full max-w-md aspect-[4/5] shadow-2xl overflow-hidden rounded-sm">
-              <Image src={authorData.imageSrc} alt={authorData.name} fill className="object-cover" priority />
-            </div>
-          </div>
-
-          <div className="space-y-6 font-serif text-lg leading-relaxed text-indigo-50">
-            {copy.paragraphs.map((paragraph, index) => (
-              <p key={index}>
-                {index === 0 ? (
-                  <>
-                    <strong className="text-white">{copy.name.replace(".", "")}</strong>
-                    {paragraph.replace("Gregori H. Orlov", "")}
-                  </>
-                ) : (
-                  paragraph
-                )}
-              </p>
-            ))}
-          </div>
+      <Suspense fallback={
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-indigo-400 border-t-transparent" />
         </div>
-      </section>
+      }>
+        <AboutContent lang={lang} />
+      </Suspense>
     </main>
   );
 }
