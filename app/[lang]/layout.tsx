@@ -1,5 +1,5 @@
-// app/[lang]/layout.tsx
 import type { ReactNode } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { SUPPORTED_LANGS, type SupportedLang } from "@/config/books";
@@ -189,7 +189,10 @@ export default async function LangLayout({
               {copy.about}
             </Link>
 
-            <LanguageSwitcher lang={validLang} supportedLangs={SUPPORTED_LANGS} />
+            {/* Envolver LanguageSwitcher en Suspense para evitar el error de useSearchParams() */}
+            <Suspense fallback={<div className="h-8 w-24 animate-pulse rounded-full bg-zinc-800" />}>
+              <LanguageSwitcher lang={validLang} supportedLangs={SUPPORTED_LANGS} />
+            </Suspense>
           </nav>
         </div>
       </header>
