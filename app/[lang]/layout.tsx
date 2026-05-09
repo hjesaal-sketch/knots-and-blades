@@ -13,7 +13,7 @@ export function generateStaticParams() {
 
 type LangLayoutProps = {
   children: ReactNode;
-  params: Promise<{ lang: SupportedLang }>;
+  params: Promise<{ lang: string }>;
 };
 
 const footerCopy: Record<
@@ -154,13 +154,17 @@ export default async function LangLayout({
   params,
 }: LangLayoutProps) {
   const { lang } = await params;
-  const copy = footerCopy[lang];
+  // Validar que lang sea un SupportedLang válido, si no usar "en" como fallback
+  const validLang = SUPPORTED_LANGS.includes(lang as SupportedLang) 
+    ? (lang as SupportedLang) 
+    : "en";
+  const copy = footerCopy[validLang];
 
   return (
     <div className="min-h-screen bg-[#05060a] text-white">
       <header className="border-b border-zinc-800 bg-black/70 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-5">
-          <Link href={`/${lang}`} className="flex items-center gap-3">
+          <Link href={`/${validLang}`} className="flex items-center gap-3">
             <Image
               src="/images/logo/knots-and-blades-logo.png"
               alt="Knots & Blades logo"
@@ -172,20 +176,20 @@ export default async function LangLayout({
           </Link>
 
           <nav className="flex items-center gap-6 text-sm">
-            <Link href={`/${lang}/home`} className="hover:text-red-300">
+            <Link href={`/${validLang}/home`} className="hover:text-red-300">
               {copy.home}
             </Link>
-            <Link href={`/${lang}/shop`} className="hover:text-red-300">
+            <Link href={`/${validLang}/shop`} className="hover:text-red-300">
               {copy.shop}
             </Link>
-            <Link href={`/${lang}/crowdfunding`} className="hover:text-red-300">
+            <Link href={`/${validLang}/crowdfunding`} className="hover:text-red-300">
               {copy.crowdfunding}
             </Link>
-            <Link href={`/${lang}/about`} className="hover:text-red-300">
+            <Link href={`/${validLang}/about`} className="hover:text-red-300">
               {copy.about}
             </Link>
 
-            <LanguageSwitcher lang={lang} supportedLangs={SUPPORTED_LANGS} />
+            <LanguageSwitcher lang={validLang} supportedLangs={SUPPORTED_LANGS} />
           </nav>
         </div>
       </header>
@@ -196,7 +200,7 @@ export default async function LangLayout({
         <div className="mx-auto max-w-7xl px-4 py-14 sm:py-16">
           <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
             <div>
-              <Link href={`/${lang}`} className="inline-flex items-center gap-3">
+              <Link href={`/${validLang}`} className="inline-flex items-center gap-3">
                 <Image
                   src="/images/logo/knots-and-blades-logo.png"
                   alt="Knots & Blades logo"
@@ -216,19 +220,19 @@ export default async function LangLayout({
                 {copy.navigation}
               </h3>
               <div className="mt-4 flex flex-col gap-3 text-sm text-white/75">
-                <Link href={`/${lang}/home`} className="transition hover:text-red-300">
+                <Link href={`/${validLang}/home`} className="transition hover:text-red-300">
                   {copy.home}
                 </Link>
-                <Link href={`/${lang}/shop`} className="transition hover:text-red-300">
+                <Link href={`/${validLang}/shop`} className="transition hover:text-red-300">
                   {copy.shop}
                 </Link>
                 <Link
-                  href={`/${lang}/crowdfunding`}
+                  href={`/${validLang}/crowdfunding`}
                   className="transition hover:text-red-300"
                 >
                   {copy.crowdfunding}
                 </Link>
-                <Link href={`/${lang}/about`} className="transition hover:text-red-300">
+                <Link href={`/${validLang}/about`} className="transition hover:text-red-300">
                   {copy.about}
                 </Link>
               </div>
