@@ -1,20 +1,16 @@
+// app/[lang]/layout.tsx
+"use client";
+
 import type { ReactNode } from "react";
+import { useState, useEffect } from "react";
 import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import { SUPPORTED_LANGS, type SupportedLang } from "@/config/books";
 import LanguageSwitcher from "./language-switcher";
 
 export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return SUPPORTED_LANGS.map((lang) => ({ lang }));
-}
-
-type LangLayoutProps = {
-  children: ReactNode;
-  params: Promise<{ lang: string }>;
-};
 
 const footerCopy: Record<
   SupportedLang,
@@ -149,55 +145,110 @@ const socialLinks = [
   },
 ];
 
-export default async function LangLayout({
-  children,
-  params,
-}: LangLayoutProps) {
-  const { lang } = await params;
-  // Validar que lang sea un SupportedLang válido, si no usar "en" como fallback
+function LayoutContent({ children }: { children: ReactNode }) {
+  const params = useParams();
+  const lang = params.lang as string;
   const validLang = SUPPORTED_LANGS.includes(lang as SupportedLang) 
     ? (lang as SupportedLang) 
     : "en";
   const copy = footerCopy[validLang];
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Cerrar menú al cambiar de ruta
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [params]);
 
   return (
     <div className="min-h-screen bg-[#05060a] text-white">
-      <header className="border-b border-zinc-800 bg-black/70 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-5">
-          <Link href={`/${validLang}`} className="flex items-center gap-3">
+      <header className="border-b border-zinc-800 bg-black/70 backdrop-blur sticky top-0 z-50">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:py-5">
+          {/* Logo */}
+          <Link href={`/${validLang}`} className="flex items-center gap-3 shrink-0">
             <Image
               src="/images/logo/knots-and-blades-logo.png"
               alt="Knots & Blades logo"
-              width={220}
-              height={55}
-              className="h-14 w-auto"
+              width={180}
+              height={45}
+              className="h-9 w-auto md:h-12"
               priority
             />
           </Link>
 
-          <nav className="flex items-center gap-6 text-sm">
-            <Link href={`/${validLang}/home`} className="hover:text-red-300">
+          {/* Botón hamburguesa - Solo en móvil */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="relative z-50 flex h-10 w-10 items-center justify-center rounded-md hover:bg-white/10 md:hidden"
+            aria-label="Menú"
+          >
+            <div className="relative h-5 w-6">
+              <span
+                className={`absolute left-0 top-0 h-0.5 w-full bg-white transition-all duration-300 ${
+                  isMenuOpen ? "top-2 rotate-45" : ""
+                }`}
+              />
+              <span
+                className={`absolute left-0 top-2 h-0.5 w-full bg-white transition-all duration-300 ${
+                  isMenuOpen ? "opacity-0" : ""
+                }`}
+              />
+              <span
+                className={`absolute left-0 top-4 h-0.5 w-full bg-white transition-all duration-300 ${
+                  isMenuOpen ? "top-2 -rotate-45" : ""
+                }`}
+              />
+            </div>
+          </button>
+
+          {/* Menú desktop */}
+          <nav className="hidden md:flex md:items-center md:gap-6">
+            <Link href={`/${validLang}/home`} className="text-sm hover:text-red-300">
               {copy.home}
             </Link>
-            <Link href={`/${validLang}/shop`} className="hover:text-red-300">
+            <Link href={`/${validLang}/shop`} className="text-sm hover:text-red-300">
               {copy.shop}
             </Link>
-            <Link href={`/${validLang}/crowdfunding`} className="hover:text-red-300">
+            <Link href={`/${validLang}/crowdfunding`} className="text-sm hover:text-red-300">
               {copy.crowdfunding}
             </Link>
-            <Link href={`/${validLang}/about`} className="hover:text-red-300">
+            <Link href={`/${validLang}/about`} className="text-sm hover:text-red-300">
               {copy.about}
             </Link>
-
-            {/* Envolver LanguageSwitcher en Suspense para evitar el error de useSearchParams() */}
             <Suspense fallback={<div className="h-8 w-24 animate-pulse rounded-full bg-zinc-800" />}>
               <LanguageSwitcher lang={validLang} supportedLangs={SUPPORTED_LANGS} />
             </Suspense>
           </nav>
+
+          {/* Menú móvil desplegable */}
+          <div
+            className={`fixed inset-0 top-[57px] z-40 bg-black/95 backdrop-blur-lg transition-transform duration-300 md:hidden ${
+              isMenuOpen ? "translate-x-0" : "translate-x-full"
+            }`}
+          >
+            <nav className="flex flex-col items-center gap-6 pt-12">
+              <Link href={`/${validLang}/home`} className="text-lg hover:text-red-300">
+                {copy.home}
+              </Link>
+              <Link href={`/${validLang}/shop`} className="text-lg hover:text-red-300">
+                {copy.shop}
+              </Link>
+              <Link href={`/${validLang}/crowdfunding`} className="text-lg hover:text-red-300">
+                {copy.crowdfunding}
+              </Link>
+              <Link href={`/${validLang}/about`} className="text-lg hover:text-red-300">
+                {copy.about}
+              </Link>
+              <div className="mt-4">
+                <Suspense fallback={<div className="h-10 w-28 animate-pulse rounded-full bg-zinc-800" />}>
+                  <LanguageSwitcher lang={validLang} supportedLangs={SUPPORTED_LANGS} />
+                </Suspense>
+              </div>
+            </nav>
+          </div>
         </div>
       </header>
 
-      <main className="min-h-screen">{children}</main>
+      <main className="min-h-screen pt-0">{children}</main>
 
       <footer className="border-t border-white/10 bg-[#07080c]">
         <div className="mx-auto max-w-7xl px-4 py-14 sm:py-16">
@@ -207,9 +258,9 @@ export default async function LangLayout({
                 <Image
                   src="/images/logo/knots-and-blades-logo.png"
                   alt="Knots & Blades logo"
-                  width={220}
-                  height={55}
-                  className="h-14 w-auto"
+                  width={180}
+                  height={45}
+                  className="h-9 w-auto md:h-12"
                 />
               </Link>
 
@@ -287,4 +338,8 @@ export default async function LangLayout({
       </footer>
     </div>
   );
+}
+
+export default function LangLayout({ children }: { children: ReactNode }) {
+  return <LayoutContent>{children}</LayoutContent>;
 }
