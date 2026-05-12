@@ -499,6 +499,7 @@ export default async function HomePage({ params }: HomePageProps) {
         </div>
       </section>
 
+      {/* VIDEO 1 - HERO (CAMBIA SOLO ESTE) */}
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0">
           <video
@@ -507,10 +508,10 @@ export default async function HomePage({ params }: HomePageProps) {
             muted
             loop
             playsInline
-            poster="https://images.pexels.com/videos/3015505/free-video-3015505.jpg?auto=compress&cs=tinysrgb&fit=crop&h=630&w=1200"
+            poster="/images/hero-poster.jpg"
           >
             <source
-              src="https://videos.pexels.com/video-files/3015505/3015505-hd_1280_720_24fps.mp4"
+              src="/videos/knots-and-blades-hero.mp4"
               type="video/mp4"
             />
           </video>
@@ -656,6 +657,7 @@ export default async function HomePage({ params }: HomePageProps) {
         </div>
       </section>
 
+      {/* VIDEO 2 - SECCIÓN INTERMEDIA (MANTENER IGUAL) */}
       <section className="relative w-full overflow-hidden border-y border-white/10 bg-black">
         <div className="relative h-[420px] w-full sm:h-[520px] lg:h-[640px]">
           <video
