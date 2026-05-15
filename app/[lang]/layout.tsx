@@ -329,7 +329,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
                   >
                     Eos Connecting
                   </a>{" "}
-                  — dev. Henry Esaá
+                  — Dev. Henry Esaá
                 </p>
               </div>
             </div>
