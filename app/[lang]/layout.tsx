@@ -319,7 +319,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
               </h3>
               <div className="mt-4 space-y-3 text-sm text-white/60">
                 <p>© 2026 Knots & Blades. {copy.rights}</p>
-                <p>
+                <p className="whitespace-nowrap">
                   {copy.builtBy}{" "}
                   <a
                     href="https://eosconnecting.com"
